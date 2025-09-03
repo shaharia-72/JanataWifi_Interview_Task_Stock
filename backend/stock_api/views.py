@@ -69,3 +69,79 @@ class StockListCreateView(APIView):
         'success': False,
         'error': str(e)
       }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class StockDetailView(APIView):
+  def get_stock(self, stock_id):
+    try:
+      return stockModel.objects.get(id=stock_id)
+    except stockModel.DoesNotExist as e:
+      return None
+
+  def get(self, request, stock_id):
+    try:
+      stock = self.get_stock(stock_id)
+      if not stock:
+        return Response({
+          'success': False,
+          'error': 'Stock not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+
+      return Response({
+        'success': True,
+        'data': StockSerializer(stock).data
+      }, status=status.HTTP_200_OK)
+    except Exception as e:
+      return Response({
+        'success': False,
+        'error': str(e)
+      }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+  def put(self, request, stock_id):
+    try:
+      stock = self.get_stock(stock_id)
+      if not stock:
+        return Response({
+          'success': False,
+          'error': 'Stock not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+
+      serializer = StockSerializer(stock, data=request.data)
+      if serializer.is_valid():
+        stock = serializer.save()
+        return Response({
+          'success': True,
+          'data': StockSerializer(stock).data
+        }, status=status.HTTP_200_OK)
+      else:
+        return Response({
+          'success': False,
+          'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    except Exception as e:
+      return Response({
+        'success': False,
+        'error': str(e)
+      }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+  def delete(self, request, stock_id):
+    try:
+      stock = self.get_stock(stock_id)
+      if not stock:
+        return Response({
+          'success': False,
+          'error': 'Stock not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+
+      stock.delete()
+      return Response({
+        'success': True,
+        'message': 'Stock deleted successfully'
+      }, status=status.HTTP_200_OK)
+
+    except Exception as e:
+      return Response({
+        'success': False,
+        'error': str(e)
+      }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
