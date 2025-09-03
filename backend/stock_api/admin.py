@@ -1,3 +1,12 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import stockModel
+
+
+@admin.register(stockModel)
+class StockAdmin(admin.ModelAdmin):
+    list_display = ['trade_code', 'date', 'open', 'high', 'low', 'close', 'volume']
+    list_filter = ['trade_code', 'date']
+    search_fields = ['trade_code', 'date']
+    ordering = ['-date', 'trade_code']
+    list_per_page = 50
