@@ -1,5 +1,3 @@
-import uuid
-
 from django.db import models
 from django.utils import timezone
 
@@ -14,7 +12,7 @@ class TimestampedModel(models.Model):
 
 
 class stockModel(TimestampedModel):
-    id = models.URLField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.BigAutoField(primary_key=True)
     date = models.DateField()
     trade_code = models.CharField(max_length=10)
     high_trade = models.DecimalField(max_digits=10, decimal_places=2)
